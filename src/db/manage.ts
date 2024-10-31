@@ -15,9 +15,8 @@ export const save = () => {
 
 export const load = () => {
   if (!existsSync(path)) {
-    // Create a new db.json with default data if it doesn't exist
     console.log("Database file not found, creating new one with default data.");
-    save(); // Save the default data
+    save();
     updateData({
       spamMessages: ["meow 🐈", "meow~ ❤️", "mrreow!!!"],
       currentSpam: 0,
@@ -26,7 +25,7 @@ export const load = () => {
         gksx: 10,
       },
     });
-    return; // Exit since we created a new file
+    return;
   }
 
   readFile(path, 'utf8', (error, fileData) => {
