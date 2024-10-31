@@ -1,11 +1,10 @@
 import { Bot, createBot } from "mineflayer"
 import antiafk = require("mineflayer-antiafk");
 
-import { meowsCommand } from "./commands/meows";
-import { topCommand } from "./commands/top";
+import fs from 'fs';
+import path from 'path';
+
 import { load, save } from "./db/manage";
-import { helpCommand } from "./commands/help";
-import { saveCommand } from "./commands/save";
 
 export let bot: Bot;
 
@@ -37,20 +36,47 @@ export const updateData = (newData: any) => {
   data = newData;
 }
 
-export let commands = [
+export let commands: Command[] = [];
 
-  meowsCommand,
-  topCommand,
-  helpCommand,
-  saveCommand
+export const loadCommands = async (): Promise<Command[]> => {
+  const commandsDir = path.join(__dirname, 'commands');
+  const commands: Command[] = [];
 
-];
+  return new Promise((resolve, reject) => {
+    fs.readdir(commandsDir, async (err, files) => {
+      if (err) {
+        console.error('Error reading commands directory:', err);
+        return reject(err);
+      }
 
-commands.forEach(command => {
-  console.log(`Registered command ${command.command}`)
-});
+      for (const file of files) {
+        if (file.endsWith('.ts') || file.endsWith('.js')) {
+          const commandPath = path.join(commandsDir, file);
 
-const registerBot = () => {
+          try {
+            const commandModule = await import(commandPath);
+            const commandName = path.basename(file, path.extname(file));
+
+            const command = commandModule[commandName + "Command"] as Command;
+
+            if (command && command.command && command.exec) {
+              commands.push(command);
+              console.log(`Registered command ${command.command}`);
+            } else {
+              console.warn(`Invalid command in file ${file}:`, command);
+            }
+          } catch (error) {
+            console.error(`Error loading command from ${file}:`, error);
+          }
+        }
+      }
+
+      resolve(commands);
+    });
+  });
+};
+
+const registerBot = async () => {
   bot = createBot({
     host : "localhost",
     port : 25568,
@@ -62,7 +88,9 @@ const registerBot = () => {
   load();
   
   console.log(data);
-  
+
+  commands = await loadCommands();
+
   let chatCounter = 0;
 
   bot.loadPlugin(antiafk);
