@@ -1,6 +1,7 @@
-import { save } from "../db/manage.js";
+import { save } from "../db/manage";
+import { Command } from "../index";
 
-export const saveCommand = {
+export const saveCommand : Command = {
   command : "save",
   desc : "saves the db",
   usage : "save",
@@ -8,7 +9,7 @@ export const saveCommand = {
   exec : async () => {
 
     save();
-    return;
+    return true;
 
   }
 }

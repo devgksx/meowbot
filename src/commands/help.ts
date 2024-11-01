@@ -25,6 +25,7 @@ export const helpCommand : Command = {
     });
 
     bot.chat(`/w ${username} ${message}`);
-
+    
+    return true;
   }
 }

@@ -17,7 +17,7 @@ export interface Command {
   desc: string;
   usage: string;
   permission: number;
-  exec: Function;
+  exec(username: string, args: string): Promise<boolean>;
 }
 
 const sanitizeMessage = (msg: string) => msg.replace(/[^\x00-\x7F]/g, ""); 
@@ -161,7 +161,10 @@ const registerBot = async () => {
       //console.log(`${playerCommand}, ${cmd.command}`)
 
       if (playerCommand.toLowerCase() == cmd.command.toLowerCase() && (data.permissions[usr] || 1) >= cmd.permission) {
-        cmd.exec(usr, playerCommandArgs);
+        cmd.exec(usr, playerCommandArgs).then((succeeded) => {
+          if (succeeded) return;
+          console.error(`${usr} executed ${cmd.command} and an error occured`);
+        });
       }
 
     });

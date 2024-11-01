@@ -24,6 +24,8 @@ export const topCommand : Command = {
     else {
       bot.chat(`/w ${username} ${topCommand.usage}`);
     }
+
+    return true;
   }
 };
 
