@@ -150,7 +150,7 @@ const registerBot = async () => {
     let playerCommand = msg.split("$")[1].split(" ")[0];
     let playerCommandArgs = msg.split("$")[1].split(" ")[1];
 
-    if (playerCommand == undefined) return;
+    if (!playerCommand) return;
 
     commands.forEach(cmd => {
 
