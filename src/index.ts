@@ -109,7 +109,7 @@ const registerBot = async () => {
     
     console.log(`WHISPER <${usr}> ${msg}`);
     
-    if (playerCommand == undefined) return;
+    if (!playerCommand) return;
     
     commands.forEach(cmd => {
 

@@ -7,7 +7,7 @@ export const helpCommand : Command = {
   permission : 1,
   exec : async (username: string, args: string) => {
     
-    if (args != undefined) {
+    if (args) {
       commands.forEach(cmd => {
         if (args == cmd.command && (data.permissions[username] || 1) >= cmd.permission) {
           bot.chat(`/w ${username} ${cmd.usage} | ${cmd.desc}`);
