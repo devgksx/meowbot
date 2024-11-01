@@ -6,6 +6,10 @@ import path from 'path';
 
 import { load, save } from "./db/manage";
 
+const config = JSON.parse(fs.readFileSync('./config.json', 'utf-8'));
+
+const prefix = config["PREFIX"];
+
 export let bot: Bot;
 
 export interface Command {
@@ -145,10 +149,10 @@ const registerBot = async () => {
     if ((msg.toLowerCase().includes("meow") || msg.toLowerCase().includes("mreow")) && !msg.includes("$")) 
       data.meowCounter[usr] = (data.meowCounter[usr] || 0) + 1;
 
-    if (!msg.startsWith("$")) return;
+    if (!msg.startsWith(prefix)) return;
 
-    let playerCommand = msg.split("$")[1].split(" ")[0];
-    let playerCommandArgs = msg.split("$")[1].split(" ")[1];
+    let playerCommand = msg.split(prefix)[1].split(" ")[0];
+    let playerCommandArgs = msg.split(prefix)[1].split(" ")[1];
 
     if (!playerCommand) return;
 
