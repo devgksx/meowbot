@@ -104,6 +104,9 @@ dist
 .temp
 .cache
 
+#db
+db.json
+
 # Docusaurus cache and generated files
 .docusaurus
 
