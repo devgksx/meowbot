@@ -4,7 +4,7 @@ import antiafk = require("mineflayer-antiafk");
 import fs from 'fs';
 import path from 'path';
 
-import { load, save } from "./db/manage";
+import { getUUID, load, save } from "./db/manage";
 
 const config = JSON.parse(fs.readFileSync('./config.json', 'utf-8'));
 
@@ -125,10 +125,12 @@ const registerBot = async () => {
   
   });
 
-  bot.on('chat', (usr: string, msg: string ) => {
+  bot.on('chat', async (usr: string, msg: string ) => {
     if (usr == "whispers") return;
     
     msg = sanitizeMessage(msg);
+
+    const uuid = await getUUID(usr); 
 
     console.log(`<${usr}> ${msg}`);
 
@@ -145,7 +147,7 @@ const registerBot = async () => {
     }
 
     if ((msg.toLowerCase().includes("meow") || msg.toLowerCase().includes("mreow")) && !msg.includes("$")) 
-      data.meowCounter[usr] = (data.meowCounter[usr] || 0) + 1;
+      data.meowCounter[uuid] = (data.meowCounter[uuid] || 0) + 1;
 
     if (!msg.startsWith(prefix)) return;
 

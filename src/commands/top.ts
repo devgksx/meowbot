@@ -1,4 +1,5 @@
 import { bot, Command, data } from "..";
+import { getUsernameFromUUID } from "../db/manage";
 
 export const topCommand : Command = {
   command: "top",
@@ -10,7 +11,7 @@ export const topCommand : Command = {
 
     if (args == "meows") {
       for (const a in data.meowCounter) {
-        array.push([a, data.meowCounter[a]]);
+        array.push([await getUsernameFromUUID(a), data.meowCounter[a]]);
       }
       array.sort(function (a, b) { return b[1] - a[1] });
       array = array.slice(0, 10);
