@@ -131,6 +131,8 @@ const registerBot = async () => {
     console.log(`<${usr}> ${msg}`);
 
     if (usr == "loc_" || msg.toLowerCase().includes(data.spamMessages[data.currentSpam])) return;
+    
+    if (msg.toLowerCase().includes("top 10 meowers:")) return;
 
     if (++chatCounter >= 50) {
       bot.chat(data.spamMessages[data.currentSpam]);
@@ -140,7 +142,7 @@ const registerBot = async () => {
       save();
     }
 
-    if ((msg.toLowerCase().includes("meow") || msg.toLowerCase().includes("mreow")) && !msg.includes("$") ) 
+    if ((msg.toLowerCase().includes("meow") || msg.toLowerCase().includes("mreow")) && !msg.includes("$")) 
       data.meowCounter[usr] = (data.meowCounter[usr] || 0) + 1;
 
     if (!msg.startsWith("$")) return;
