@@ -117,8 +117,6 @@ const registerBot = async () => {
     
     commands.forEach(cmd => {
 
-      //console.log(`${playerCommand}, ${cmd.command}`)
-
       if (playerCommand.toLowerCase() == cmd.command.toLowerCase() && (data.permissions[usr] || 1) >= cmd.permission) {
         cmd.exec(usr, playerCommandArgs);
       }
@@ -157,8 +155,6 @@ const registerBot = async () => {
     if (!playerCommand) return;
 
     commands.forEach(cmd => {
-
-      //console.log(`${playerCommand}, ${cmd.command}`)
 
       if (playerCommand.toLowerCase() == cmd.command.toLowerCase() && (data.permissions[usr] || 1) >= cmd.permission) {
         cmd.exec(usr, playerCommandArgs).then((succeeded) => {
