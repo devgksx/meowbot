@@ -1,5 +1,4 @@
 import { Bot, createBot } from "mineflayer"
-import antiafk = require("mineflayer-antiafk");
 
 import fs from 'fs';
 import path from 'path';
@@ -86,7 +85,6 @@ const registerBot = async () => {
     port : 25565,
     username : process.env.USERNAME,
     auth : "microsoft",
-    //version : "1.21"
   })
 
   load();
@@ -94,15 +92,8 @@ const registerBot = async () => {
   console.log(data);
 
   commands = await loadCommands();
-
+  
   let chatCounter = 0;
-
-  bot.loadPlugin(antiafk);
-
-  bot.on("spawn", () => {
-    bot.afk.setOptions({ fishing: false }); //disables fishing
-    bot.afk.start();
-  });
   
   bot.on('error', (err) => console.error(err));
   bot.on('end', registerBot);
@@ -128,6 +119,8 @@ const registerBot = async () => {
 
   bot.on('chat', async (usr: string, msg: string ) => {
     if (usr == "whispers") return;
+
+    bot.swingArm("right");
     
     msg = sanitizeMessage(msg);
 
