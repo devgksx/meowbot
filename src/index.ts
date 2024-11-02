@@ -98,9 +98,11 @@ const registerBot = async () => {
   bot.on('error', (err) => console.error(err));
   bot.on('end', registerBot);
 
-  bot.on("whisper", (usr: string, msg: string) => {
+  bot.on("whisper", async (usr: string, msg: string) => {
 
     const [playerCommand, ...playerCommandArgs] = msg.split(" ");
+    const uuid = await getUUID(usr);
+
     console.log(playerCommand);
     
     console.log(`WHISPER <${usr}> ${msg}`);
@@ -109,8 +111,11 @@ const registerBot = async () => {
     
     commands.forEach(cmd => {
 
-      if (playerCommand.toLowerCase() == cmd.command.toLowerCase() && (data.permissions[usr] || 1) >= cmd.permission) {
-        cmd.exec(usr, playerCommandArgs);
+      if (playerCommand.toLowerCase() == cmd.command.toLowerCase() && (data.permissions[uuid] || 1) >= cmd.permission) {
+        cmd.exec(usr, playerCommandArgs).then((succeeded) => {
+          if (succeeded) return;
+          console.error(`${usr} executed ${cmd.command} and an error occured`);
+        });
       }
 
     });
@@ -151,7 +156,7 @@ const registerBot = async () => {
 
     commands.forEach(cmd => {
 
-      if (playerCommand.toLowerCase() == cmd.command.toLowerCase() && (data.permissions[usr] || 1) >= cmd.permission) {
+      if (playerCommand.toLowerCase() == cmd.command.toLowerCase() && (data.permissions[uuid] || 1) >= cmd.permission) {
         cmd.exec(usr, playerCommandArgs).then((succeeded) => {
           if (succeeded) return;
           console.error(`${usr} executed ${cmd.command} and an error occured`);
