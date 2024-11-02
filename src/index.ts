@@ -17,7 +17,7 @@ export interface Command {
   desc: string;
   usage: string;
   permission: number;
-  exec(username: string, args: string): Promise<boolean>;
+  exec(username: string, args: string[]): Promise<boolean>;
 }
 
 const sanitizeMessage = (msg: string) => msg.replace(/[^\x00-\x7F]/g, ""); 
@@ -82,11 +82,11 @@ export const loadCommands = async (): Promise<Command[]> => {
 
 const registerBot = async () => {
   bot = createBot({
-    host : "localhost",
-    port : 25568,
+    host : "constantiam.net",
+    port : 25565,
     username : process.env.USERNAME,
     auth : "microsoft",
-    version : "1.20.6"
+    //version : "1.21"
   })
 
   load();
@@ -108,8 +108,9 @@ const registerBot = async () => {
   bot.on('end', registerBot);
 
   bot.on("whisper", (usr: string, msg: string) => {
-    let playerCommand = msg.split(" ")[0];
-    let playerCommandArgs = msg.split(" ")[1];
+
+    const [playerCommand, ...playerCommandArgs] = msg.split(" ");
+    console.log(playerCommand);
     
     console.log(`WHISPER <${usr}> ${msg}`);
     
@@ -151,8 +152,7 @@ const registerBot = async () => {
 
     if (!msg.startsWith(prefix)) return;
 
-    let playerCommand = msg.split(prefix)[1].split(" ")[0];
-    let playerCommandArgs = msg.split(prefix)[1].split(" ")[1];
+    const [playerCommand, ...playerCommandArgs] = msg.slice(1).split(" ");
 
     if (!playerCommand) return;
 

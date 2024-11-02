@@ -6,10 +6,10 @@ export const topCommand : Command = {
   desc: "Top players for a specific category.",
   usage: "top <meows>",
   permission : 1,
-  exec: async (username: string, args: string) => {
+  exec: async (username, args) => {
     let array = [];
 
-    if (args == "meows") {
+    if (args[0] == "meows") {
       for (const a in data.meowCounter) {
         array.push([await getUsernameFromUUID(a), data.meowCounter[a]]);
       }

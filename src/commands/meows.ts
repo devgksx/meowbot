@@ -6,8 +6,8 @@ export const meowsCommand : Command = {
   desc : "How many times you've said meow",
   usage : "meows <player?>",
   permission : 1,
-  exec : async (username: string, args: string) => {
-    bot.chat(`/w ${username} ${args || username} said it ${data.meowCounter[await getUUID(args || username)]} times!`);
+  exec : async (username, args) => {
+    bot.chat(`/w ${username} ${args[0] || username} said it ${data.meowCounter[await getUUID(args[0] || username)]} times!`);
     return true;
   }
 };

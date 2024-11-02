@@ -6,7 +6,7 @@ export const sourceCommand : Command = {
   desc : "source code of the bot",
   usage : "source",
   permission : 1,
-  exec : async (username: string) => {
+  exec : async (username) => {
     
     bot.chat(`/w ${username} https://github.com/devgksx/meowbot/`);
 
