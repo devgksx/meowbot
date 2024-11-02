@@ -7,10 +7,6 @@ export const getPermissionsCommand : Command = {
   permission : 10,
   desc : "Gets the permission level of a player",
   exec : async (username, args) => {
-    if (!args[0]) {
-      bot.chat(`/w ${username} ${getPermissionsCommand.usage}`);
-      return false;
-    }
     const player = args[0] || username;
     bot.chat(`/w ${username} Player ${player} has the permission level ${data.permissions[await getUUID(player)] || 1}`);
     return true;
