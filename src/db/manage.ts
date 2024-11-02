@@ -74,7 +74,7 @@ export const load = () => {
       currentSpam: 0,
       meowCounter: {},
       permissions: {
-        gksx: 10,
+        "8abcc4da97154dc589a504dae800d16b": 10,
       },
     });
     return;
