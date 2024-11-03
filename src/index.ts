@@ -95,6 +95,7 @@ const registerBot = async () => {
   
   let chatCounter = 0;
   
+  bot.on('error', (err) => console.error(err));
   bot.on('end', registerBot);
 
   bot.on("whisper", async (usr: string, msg: string) => {
