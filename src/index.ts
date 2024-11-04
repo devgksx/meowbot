@@ -4,10 +4,26 @@ import fs from 'fs';
 import path from 'path';
 
 import { getUUID, load, save } from "./db/manage";
+import { sendWebhookMessage } from "./discord/manage";
 
-const config = JSON.parse(fs.readFileSync('./config.json', 'utf-8'));
+if (!fs.existsSync('./config.json')) {
+  fs.writeFileSync('./config.json', JSON.stringify({
+    "PREFIX": "$",
+    "WEBHOOK_URL": "",
+    "DISCORD_ENABLED": false,
+    "SERVER": "constantiam.net",
+  }, null, 2));
+}
+
+export const config = JSON.parse(fs.readFileSync('./config.json', 'utf-8'));
+
+console.log(config);
 
 const prefix = config["PREFIX"];
+const server = config["SERVER"];
+
+export const webhook_url = config["WEBHOOK_URL"];
+export const discord_enabled = config["DISCORD_ENABLED"];
 
 export let bot: Bot;
 
@@ -81,7 +97,7 @@ export const loadCommands = async (): Promise<Command[]> => {
 
 const registerBot = async () => {
   bot = createBot({
-    host : "constantiam.net",
+    host : server,
     port : 25565,
     username : process.env.USERNAME,
     auth : "microsoft",
@@ -127,12 +143,14 @@ const registerBot = async () => {
 
   bot.on('chat', async (usr: string, msg: string ) => {
     if (usr == "whispers") return;
+    
+    const uuid = await getUUID(usr); 
+
+    sendWebhookMessage(usr, uuid, `${msg}`);
 
     bot.swingArm("right");
     
     msg = sanitizeMessage(msg);
-
-    const uuid = await getUUID(usr); 
 
     console.log(`<${usr}> ${msg}`);
 
