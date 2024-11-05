@@ -146,7 +146,7 @@ const registerBot = async () => {
     
     const uuid = await getUUID(usr); 
 
-    sendWebhookMessage(usr, uuid, `${msg}`);
+    sendWebhookMessage(usr, uuid, `${msg}`, (msg.startsWith(">") ? { color: 0x00FF00 } : undefined));
 
     bot.swingArm("right");
     
@@ -191,5 +191,3 @@ const registerBot = async () => {
 }
 
 registerBot();
-
-
