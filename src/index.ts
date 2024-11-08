@@ -17,8 +17,6 @@ if (!fs.existsSync('./config.json')) {
 
 export const config = JSON.parse(fs.readFileSync('./config.json', 'utf-8'));
 
-console.log(config);
-
 const prefix = config["PREFIX"];
 const server = config["SERVER"];
 
