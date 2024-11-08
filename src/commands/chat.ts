@@ -6,7 +6,9 @@ export const chatCommand : Command = {
   usage : "chat <message>",
   permission : 1,
   exec : async (_, args) => {
-    bot.chat(args.join(" "));
+    const msg = args.join(" ");
+    if (!msg.startsWith("/"))
+      bot.chat(msg);
     return true;
   }
 }
