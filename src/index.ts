@@ -76,7 +76,7 @@ export const loadCommands = async (): Promise<Command[]> => {
             const commandModule = await import(commandPath);
             const commandName = path.basename(file, path.extname(file));
 
-            const command = commandModule[commandName + "Command"] as Command;
+            const command = commandModule[(commandName.match(/^\d/) ? `_${commandName}` : commandName) + "Command"] as Command;
 
             if (command && command.command && command.exec) {
               commands.push(command);

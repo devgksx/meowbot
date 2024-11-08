@@ -1,6 +1,6 @@
 import { bot, Command } from "..";
 
-export const eightBallCommand : Command = {
+export const _8ballCommand : Command = {
   command : "8ball",
   permission : 1,
   usage : "8ball",
