@@ -9,25 +9,23 @@ export const setPermissionCommand: Command = {
   command: "setpermission",
   exec: async (username, args) => {
     const uuid = await getUUID(args[0]);
-    const player = await prisma.player.findFirst({
-      where: {
-        uuid: uuid,
-      },
-    });
 
     prisma.player
-      .update({
+      .upsert({
         where: {
-          id: player.id,
+          uuid: uuid,
         },
-        data: {
+        update: {
+          permission: parseInt(args[1]),
+        },
+        create: {
+          meows: 0,
+          uuid: uuid,
           permission: parseInt(args[1]),
         },
       })
       .catch((e) => {
-        bot.chat(
-          `/w ${username} Error setting permission level for player ${args[0]}. ${e}`,
-        );
+        console.error(e);
         return false;
       });
 

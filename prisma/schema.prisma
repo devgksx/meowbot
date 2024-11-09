@@ -8,8 +8,7 @@ datasource db {
 }
 
 model Player {
-  id         String @id @default(auto()) @map("_id") @db.ObjectId
-  uuid       String
+  uuid       String @id @map("_id")
   meows      Int
   permission Int
 }

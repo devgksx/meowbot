@@ -9,21 +9,18 @@ export const meowsCommand: Command = {
   permission: 1,
   exec: async (username, args) => {
     const uuid = await getUUID(args[0] || username);
-    const player = await prisma.player.findFirst({
+
+    let player = await prisma.player.upsert({
       where: {
         uuid: uuid,
       },
+      update: {},
+      create: {
+        meows: 0,
+        uuid: uuid,
+        permission: 1,
+      },
     });
-
-    if (!player) {
-      await prisma.player.create({
-        data: {
-          meows: 0,
-          uuid: uuid,
-          permission: 1,
-        },
-      });
-    }
 
     bot.chat(
       `/w ${username} ${args[0] || username} said it ${player.meows || 0} times!`,

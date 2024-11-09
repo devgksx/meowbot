@@ -214,21 +214,19 @@ const registerBot = async () => {
         msg.toLowerCase().includes("mreow")) &&
       !msg.includes("$")
     ) {
-      await prisma.player
-        .update({
-          where: {
-            id: player.id,
-          },
-          data: {
-            meows: player.meows + 1,
-          },
-        })
-        .catch((e) => {
-          console.error(
-            `Error updating meows for player ${usr} with uuid ${uuid}:`,
-            e,
-          );
-        });
+      await prisma.player.upsert({
+        where: {
+          uuid: uuid,
+        },
+        update: {
+          meows: player.meows + 1,
+        },
+        create: {
+          meows: 1,
+          uuid: uuid,
+          permission: 1,
+        },
+      });
     }
 
     if (!msg.startsWith(prefix)) return;
