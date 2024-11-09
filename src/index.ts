@@ -197,11 +197,9 @@ const registerBot = async () => {
     )
       return;
 
-    if (msg.toLowerCase().includes("top 10 meowers:")) return;
-
     if (++chatCounter >= 50) {
       bot.chat(data.spamMessages[data.currentSpam]);
-      if (chatCounter >= 100) rotateMessage();
+      rotateMessage();
       chatCounter = 0;
     }
 
