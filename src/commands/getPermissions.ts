@@ -1,4 +1,4 @@
-import { bot, Command, data } from "..";
+import { bot, Command } from "..";
 import { getUUID } from "../db/manage";
 import prisma from "../db/prisma";
 
@@ -15,7 +15,7 @@ export const getPermissionsCommand: Command = {
       },
     });
     bot.chat(
-      `/w ${username} Player ${player} has the permission level ${player.permission || 1}`,
+      `/w ${username} Player ${args[0] || username} has the permission level ${player.permission || 1}`,
     );
     return true;
   },
