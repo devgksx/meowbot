@@ -1,5 +1,5 @@
-import { readFile, writeFile, existsSync } from 'fs';
-import { data, updateData } from '..';
+import { readFile, writeFile, existsSync } from "fs";
+import { data, updateData } from "..";
 
 let path = "./db.json";
 
@@ -11,7 +11,7 @@ export const save = () => {
     }
     console.log("Database has been saved");
   });
-}
+};
 
 const usernameCache: Record<string, string> = {};
 const uuidCache: Record<string, string> = {};
@@ -22,9 +22,11 @@ export const getUUID = async (username: string): Promise<string | null> => {
   }
 
   try {
-    const response = await fetch(`https://api.mojang.com/users/profiles/minecraft/${username}`);
+    const response = await fetch(
+      `https://api.mojang.com/users/profiles/minecraft/${username}`,
+    );
     if (!response.ok) {
-      throw new Error('Response was not ok');
+      throw new Error("Response was not ok");
     }
     const data = await response.json();
     const uuid = data.id || null;
@@ -35,32 +37,35 @@ export const getUUID = async (username: string): Promise<string | null> => {
 
     return uuid;
   } catch (error) {
-    console.error('Error fetching uuid:', error);
+    console.error("Error fetching uuid:", error);
     return null;
   }
 };
 
-
-export const getUsernameFromUUID = async (uuid: string): Promise<string | null> => {
+export const getUsernameFromUUID = async (
+  uuid: string,
+): Promise<string | null> => {
   if (usernameCache[uuid]) {
     return usernameCache[uuid];
   }
 
   try {
-    const response = await fetch(`https://sessionserver.mojang.com/session/minecraft/profile/${uuid}`);
+    const response = await fetch(
+      `https://sessionserver.mojang.com/session/minecraft/profile/${uuid}`,
+    );
     if (!response.ok) {
-      throw new Error('Response was not ok');
+      throw new Error("Response was not ok");
     }
     const data = await response.json();
     const username = data.name || null;
-    
+
     if (username) {
       usernameCache[uuid] = username;
     }
 
     return username;
   } catch (error) {
-    console.error('Error fetching username:', error);
+    console.error("Error fetching username:", error);
     return null;
   }
 };
@@ -80,7 +85,7 @@ export const load = () => {
     return;
   }
 
-  readFile(path, 'utf8', (error, fileData) => {
+  readFile(path, "utf8", (error, fileData) => {
     if (error) {
       console.log("An error has occurred", error);
       return;
@@ -94,5 +99,4 @@ export const load = () => {
       console.log("Failed to parse JSON:", parseError);
     }
   });
-}
-
+};

@@ -1,12 +1,11 @@
 import { bot, Command } from "..";
 
-export const _8ballCommand : Command = {
-  command : "8ball",
-  permission : 1,
-  usage : "8ball",
-  desc : "Ask the magic 8ball a question",
-  exec : async (username, _) => {    
-    
+export const _8ballCommand: Command = {
+  command: "8ball",
+  permission: 1,
+  usage: "8ball",
+  desc: "Ask the magic 8ball a question",
+  exec: async (username, _) => {
     const responses = [
       "It is certain",
       "It is decidedly so",
@@ -27,12 +26,11 @@ export const _8ballCommand : Command = {
       "My reply is no",
       "My sources say no",
       "Outlook not so good",
-      "Very doubtful"
+      "Very doubtful",
     ];
-    
-    const response = responses[Math.floor(Math.random() * responses.length)];
-    bot.chat(`/w ${username} ${response}`); 
-    return true;
 
-  }
-}
+    const response = responses[Math.floor(Math.random() * responses.length)];
+    bot.chat(`/w ${username} ${response}`);
+    return true;
+  },
+};

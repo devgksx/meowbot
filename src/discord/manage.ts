@@ -22,13 +22,23 @@ export const getHead = async (uuid: string): Promise<string> => {
   }
 };
 
-export const sendWebhookMessage = async (username: string, uuid: string, content: string, embedData?: { title?: string; description?: string; color?: number; fields?: { name: string; value: string; inline?: boolean }[] }) => {
+export const sendWebhookMessage = async (
+  username: string,
+  uuid: string,
+  content: string,
+  embedData?: {
+    title?: string;
+    description?: string;
+    color?: number;
+    fields?: { name: string; value: string; inline?: boolean }[];
+  },
+) => {
   if (!webhook_url || !discord_enabled) return;
 
   const embed = {
     description: `**${username}**: ${content}`,
     color: embedData?.color || 0x0,
-    footer : {
+    footer: {
       text: "\u200b",
       icon_url: await getHead(uuid),
     },
@@ -53,4 +63,3 @@ export const sendWebhookMessage = async (username: string, uuid: string, content
     console.error("Failed to send embed message:", error);
   }
 };
-
