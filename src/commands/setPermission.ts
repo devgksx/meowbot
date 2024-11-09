@@ -1,4 +1,4 @@
-import { bot, Command, data } from "..";
+import { bot, Command } from "..";
 import { getUUID } from "../db/manage";
 import prisma from "../db/prisma";
 
