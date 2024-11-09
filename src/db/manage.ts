@@ -1,18 +1,3 @@
-import { readFile, writeFile, existsSync } from "fs";
-import { data, updateData } from "..";
-
-let path = "./db.json";
-
-export const save = () => {
-  writeFile(path, JSON.stringify(data, null, 2), (error) => {
-    if (error) {
-      console.log("An error has occurred ", error);
-      return;
-    }
-    console.log("Database has been saved");
-  });
-};
-
 const usernameCache: Record<string, string> = {};
 const uuidCache: Record<string, string> = {};
 
@@ -68,35 +53,4 @@ export const getUsernameFromUUID = async (
     console.error("Error fetching username:", error);
     return null;
   }
-};
-
-export const load = () => {
-  if (!existsSync(path)) {
-    console.log("Database file not found, creating new one with default data.");
-    save();
-    updateData({
-      spamMessages: ["meow 🐈", "meow~ ❤️", "mrreow!!!"],
-      currentSpam: 0,
-      meowCounter: {},
-      permissions: {
-        "8abcc4da97154dc589a504dae800d16b": 10,
-      },
-    });
-    return;
-  }
-
-  readFile(path, "utf8", (error, fileData) => {
-    if (error) {
-      console.log("An error has occurred", error);
-      return;
-    }
-
-    try {
-      const newData = JSON.parse(fileData);
-      updateData(newData);
-      console.log("Database loaded!");
-    } catch (parseError) {
-      console.log("Failed to parse JSON:", parseError);
-    }
-  });
 };

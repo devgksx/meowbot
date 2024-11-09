@@ -3,8 +3,9 @@ import { Bot, createBot } from "mineflayer";
 import fs from "fs";
 import path from "path";
 
-import { getUUID, load, save } from "./db/manage";
+import { getUUID } from "./db/manage";
 import { sendWebhookMessage } from "./discord/manage";
+import prisma from "./db/prisma";
 
 if (!fs.existsSync("./config.json")) {
   fs.writeFileSync(
@@ -51,10 +52,6 @@ const rotateMessage = async () => {
 export let data = {
   spamMessages: ["meow 🐈", "meow~ ❤️", "mrreow!!!"],
   currentSpam: 0,
-  meowCounter: {},
-  permissions: {
-    gksx: 10,
-  },
 };
 
 export const updateData = (newData: any) => {
@@ -112,10 +109,6 @@ const registerBot = async () => {
     auth: "microsoft",
   });
 
-  load();
-
-  console.log(data);
-
   commands = await loadCommands();
 
   let chatCounter = 0;
@@ -129,6 +122,21 @@ const registerBot = async () => {
   bot.on("whisper", async (usr: string, msg: string) => {
     const [playerCommand, ...playerCommandArgs] = msg.split(" ");
     const uuid = await getUUID(usr);
+    const player = await prisma.player.findFirst({
+      where: {
+        uuid: uuid,
+      },
+    });
+
+    if (!player) {
+      await prisma.player.create({
+        data: {
+          meows: 0,
+          uuid: uuid,
+          permission: 1,
+        },
+      });
+    }
 
     console.log(playerCommand);
 
@@ -139,7 +147,7 @@ const registerBot = async () => {
     commands.forEach((cmd) => {
       if (
         playerCommand.toLowerCase() == cmd.command.toLowerCase() &&
-        (data.permissions[uuid] || 1) >= cmd.permission
+        (player.permission || 1) >= cmd.permission
       ) {
         cmd.exec(usr, playerCommandArgs).then((succeeded) => {
           if (succeeded) return;
@@ -153,6 +161,21 @@ const registerBot = async () => {
     if (usr == "whispers") return;
 
     const uuid = await getUUID(usr);
+    const player = await prisma.player.findFirst({
+      where: {
+        uuid: uuid,
+      },
+    });
+
+    if (!player) {
+      await prisma.player.create({
+        data: {
+          meows: 0,
+          uuid: uuid,
+          permission: 1,
+        },
+      });
+    }
 
     sendWebhookMessage(
       usr,
@@ -179,15 +202,22 @@ const registerBot = async () => {
       bot.chat(data.spamMessages[data.currentSpam]);
       if (chatCounter >= 100) rotateMessage();
       chatCounter = 0;
-      save();
     }
 
     if (
       (msg.toLowerCase().includes("meow") ||
         msg.toLowerCase().includes("mreow")) &&
       !msg.includes("$")
-    )
-      data.meowCounter[uuid] = (data.meowCounter[uuid] || 0) + 1;
+    ) {
+      await prisma.player.update({
+        where: {
+          id: player.id,
+        },
+        data: {
+          meows: player.meows + 1,
+        },
+      });
+    }
 
     if (!msg.startsWith(prefix)) return;
 
@@ -198,7 +228,7 @@ const registerBot = async () => {
     commands.forEach((cmd) => {
       if (
         playerCommand.toLowerCase() == cmd.command.toLowerCase() &&
-        (data.permissions[uuid] || 1) >= cmd.permission
+        (player.permission || 1) >= cmd.permission
       ) {
         cmd.exec(usr, playerCommandArgs).then((succeeded) => {
           if (succeeded) return;

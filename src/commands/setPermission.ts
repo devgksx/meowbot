@@ -1,5 +1,6 @@
 import { bot, Command, data } from "..";
 import { getUUID } from "../db/manage";
+import prisma from "../db/prisma";
 
 export const setPermissionCommand: Command = {
   desc: "Sets the permission of a user",
@@ -7,7 +8,22 @@ export const setPermissionCommand: Command = {
   usage: "setpermission <username>",
   command: "setpermission",
   exec: async (username, args) => {
-    data.permissions[await getUUID(args[0])] = args[1];
+    const uuid = await getUUID(args[0]);
+    const player = await prisma.player.findFirst({
+      where: {
+        uuid: uuid,
+      },
+    });
+
+    prisma.player.update({
+      where: {
+        id: player.id,
+      },
+      data: {
+        permission: parseInt(args[1]),
+      },
+    });
+
     bot.chat(
       `/w ${username} Permission level for player ${args[0]} set to ${args[1]}`,
     );

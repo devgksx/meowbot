@@ -1,5 +1,6 @@
 import { bot, Command, commands, data } from "..";
 import { getUUID } from "../db/manage";
+import prisma from "../db/prisma";
 
 export const helpCommand: Command = {
   command: "help",
@@ -7,9 +8,13 @@ export const helpCommand: Command = {
   usage: "help <command?>",
   permission: 1,
   exec: async (username, args) => {
-    const playerPermissionLevel =
-      data.permissions[await getUUID(username)] || 1;
-
+    const uuid = await getUUID(username);
+    const player = await prisma.player.findFirst({
+      where: {
+        uuid: uuid,
+      },
+    });
+    const playerPermissionLevel = player.permission || 1;
     if (args[0]) {
       commands.forEach((cmd) => {
         if (args[0] == cmd.command && playerPermissionLevel >= cmd.permission) {

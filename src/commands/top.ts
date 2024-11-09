@@ -1,5 +1,6 @@
-import { bot, Command, data } from "..";
+import { bot, Command } from "..";
 import { getUsernameFromUUID } from "../db/manage";
+import prisma from "../db/prisma";
 
 export const topCommand: Command = {
   command: "top",
@@ -9,9 +10,14 @@ export const topCommand: Command = {
   exec: async (username, args) => {
     let array = [];
 
+    const players = await prisma.player.findMany();
+
     if (args[0] == "meows") {
-      for (const a in data.meowCounter) {
-        array.push([await getUsernameFromUUID(a), data.meowCounter[a]]);
+      for (const a in players) {
+        array.push([
+          await getUsernameFromUUID(players[a].uuid),
+          players[a].meows,
+        ]);
       }
       array.sort(function (a, b) {
         return b[1] - a[1];
