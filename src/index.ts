@@ -157,8 +157,11 @@ const registerBot = async () => {
     });
   });
 
-  bot.on("chat", async (usr: string, msg: string) => {
-    if (usr == "whispers") return;
+  bot.on("message", async (message) => {
+    const usr: string = message.json["extra"]?.[0]?.extra?.[1]?.text;
+    let msg: string = message.json["extra"]?.[2]?.text.slice(1);
+
+    if (!usr || !msg) return;
 
     const uuid = await getUUID(usr);
     const player = await prisma.player.findFirst({
