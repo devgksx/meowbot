@@ -15,14 +15,21 @@ export const setPermissionCommand: Command = {
       },
     });
 
-    prisma.player.update({
-      where: {
-        id: player.id,
-      },
-      data: {
-        permission: parseInt(args[1]),
-      },
-    });
+    prisma.player
+      .update({
+        where: {
+          id: player.id,
+        },
+        data: {
+          permission: parseInt(args[1]),
+        },
+      })
+      .catch((e) => {
+        bot.chat(
+          `/w ${username} Error setting permission level for player ${args[0]}. ${e}`,
+        );
+        return false;
+      });
 
     bot.chat(
       `/w ${username} Permission level for player ${args[0]} set to ${args[1]}`,

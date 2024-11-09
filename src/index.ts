@@ -149,7 +149,7 @@ const registerBot = async () => {
       ) {
         cmd.exec(usr, playerCommandArgs).then((succeeded) => {
           if (succeeded) return;
-          console.error(`${usr} executed ${cmd.command} and an error occured`);
+          console.log(`${usr} executed ${cmd.command} and an error occured`);
         });
       }
     });
@@ -233,7 +233,7 @@ const registerBot = async () => {
       ) {
         cmd.exec(usr, playerCommandArgs).then((succeeded) => {
           if (succeeded) return;
-          console.error(`${usr} executed ${cmd.command} and an error occured`);
+          console.log(`${usr} executed ${cmd.command} and an error occured`);
         });
       }
     });

@@ -3,11 +3,18 @@ import { bot, Command } from "..";
 export const geolocCommand: Command = {
   command: "geoloc",
   permission: 1,
-  usage: "geoloc",
-  desc: "Get your current geolocation",
+  usage: "geoloc <ip> [ use commas instead of periods ]",
+  desc: "Get approximate location of an IP",
   exec: async (username, args) => {
     const ip = args[0];
-    const url = `http://ip-api.com/json/${ip}`;
+
+    if (!ip) {
+      bot.chat(`/w ${username} Usage: ${geolocCommand.usage}`);
+      console.log(args);
+      return false;
+    }
+
+    const url = `http://ip-api.com/json/${ip.replace(/,/g, ".")}`;
     const data = await (await fetch(url)).json();
 
     bot.chat(

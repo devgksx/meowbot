@@ -15,6 +15,16 @@ export const meowsCommand: Command = {
       },
     });
 
+    if (!player) {
+      await prisma.player.create({
+        data: {
+          meows: 0,
+          uuid: uuid,
+          permission: 1,
+        },
+      });
+    }
+
     bot.chat(
       `/w ${username} ${args[0] || username} said it ${player.meows || 0} times!`,
     );

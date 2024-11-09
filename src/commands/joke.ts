@@ -9,6 +9,11 @@ export const jokeCommand: Command = {
     const url = "https://official-joke-api.appspot.com/jokes/random";
     const data = await (await fetch(url)).json();
 
+    if (!data.setup || !data.punchline) {
+      bot.chat(`/w ${username} Something went wrong, please try again later`);
+      return false;
+    }
+
     bot.chat(`/w ${username} ${data.setup} ${data.punchline}`);
 
     return true;

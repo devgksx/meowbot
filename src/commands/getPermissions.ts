@@ -14,6 +14,17 @@ export const getPermissionsCommand: Command = {
         uuid: uuid,
       },
     });
+
+    if (!player) {
+      await prisma.player.create({
+        data: {
+          meows: 0,
+          uuid: uuid,
+          permission: 1,
+        },
+      });
+    }
+
     bot.chat(
       `/w ${username} Player ${args[0] || username} has the permission level ${player.permission || 1}`,
     );
