@@ -138,8 +138,6 @@ const registerBot = async () => {
       });
     }
 
-    console.log(playerCommand);
-
     console.log(`WHISPER <${usr}> ${msg}`);
 
     if (!playerCommand) return;
