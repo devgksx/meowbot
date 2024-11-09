@@ -22,6 +22,8 @@ export const getHead = async (uuid: string): Promise<string> => {
   }
 };
 
+const removeMarkdown = (text: string) => text.replace(/([*_~`|])/g, "\\$1");
+
 export const sendWebhookMessage = async (
   username: string,
   uuid: string,
@@ -36,7 +38,7 @@ export const sendWebhookMessage = async (
   if (!webhook_url || !discord_enabled) return;
 
   const embed = {
-    description: `**${username}**: ${content}`,
+    description: `**${removeMarkdown(username)}**: ${removeMarkdown(content)}`,
     color: embedData?.color || 0x0,
     footer: {
       text: "\u200b",
