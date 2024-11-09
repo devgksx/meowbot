@@ -6,7 +6,9 @@ export const discordCommand: Command = {
   usage: "discord",
   permission: 1,
   exec: async (username) => {
-    bot.chat(`/w ${username} Discord server: https://discord.gg/ZDFWDubzRG`);
+    bot.chat(
+      `/w ${username} Discord server: https://tinyurl.com/meowbotdiscord`,
+    );
 
     return true;
   },
