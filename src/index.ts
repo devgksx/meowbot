@@ -50,7 +50,7 @@ const rotateMessage = async () => {
 };
 
 export let data = {
-  spamMessages: ["meow 🐈", "meow~ ❤️", "mrreow!!!"],
+  spamMessages: ["meow 🐈", "meow~ ❤", "mrreow!!!"],
   currentSpam: 0,
 };
 
@@ -162,7 +162,7 @@ const registerBot = async () => {
     if (!usr || !msg) return;
 
     const uuid = await getUUID(usr);
-    const player = await prisma.player.findFirst({
+    let player = await prisma.player.findFirst({
       where: {
         uuid: uuid,
       },
@@ -174,6 +174,12 @@ const registerBot = async () => {
           meows: 0,
           uuid: uuid,
           permission: 1,
+        },
+      });
+
+      player = await prisma.player.findFirst({
+        where: {
+          uuid: uuid,
         },
       });
     }
@@ -208,14 +214,21 @@ const registerBot = async () => {
         msg.toLowerCase().includes("mreow")) &&
       !msg.includes("$")
     ) {
-      await prisma.player.update({
-        where: {
-          id: player.id,
-        },
-        data: {
-          meows: player.meows + 1,
-        },
-      });
+      await prisma.player
+        .update({
+          where: {
+            id: player.id,
+          },
+          data: {
+            meows: player.meows + 1,
+          },
+        })
+        .catch((e) => {
+          console.error(
+            `Error updating meows for player ${usr} with uuid ${uuid}:`,
+            e,
+          );
+        });
     }
 
     if (!msg.startsWith(prefix)) return;
