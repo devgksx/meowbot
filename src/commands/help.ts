@@ -9,11 +9,17 @@ export const helpCommand: Command = {
   permission: 1,
   exec: async (username, args) => {
     const uuid = await getUUID(username);
-    const player = await prisma.player.findFirst({
-      where: {
+
+    const player = await prisma.player.upsert({
+      where: { uuid: uuid },
+      update: {},
+      create: {
+        meows: 0,
         uuid: uuid,
+        permission: 1,
       },
     });
+
     const playerPermissionLevel = player.permission || 1;
     if (args[0]) {
       commands.forEach((cmd) => {

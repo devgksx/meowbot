@@ -122,21 +122,15 @@ const registerBot = async () => {
   bot.on("whisper", async (usr: string, msg: string) => {
     const [playerCommand, ...playerCommandArgs] = msg.split(" ");
     const uuid = await getUUID(usr);
-    const player = await prisma.player.findFirst({
-      where: {
+    const player = await prisma.player.upsert({
+      where: { uuid: uuid },
+      update: {},
+      create: {
+        meows: 0,
         uuid: uuid,
+        permission: 1,
       },
     });
-
-    if (!player) {
-      await prisma.player.create({
-        data: {
-          meows: 0,
-          uuid: uuid,
-          permission: 1,
-        },
-      });
-    }
 
     console.log(`WHISPER <${usr}> ${msg}`);
 
@@ -162,27 +156,16 @@ const registerBot = async () => {
     if (!usr || !msg) return;
 
     const uuid = await getUUID(usr);
-    let player = await prisma.player.findFirst({
-      where: {
+
+    const player = await prisma.player.upsert({
+      where: { uuid: uuid },
+      update: {},
+      create: {
+        meows: 0,
         uuid: uuid,
+        permission: 1,
       },
     });
-
-    if (!player) {
-      await prisma.player.create({
-        data: {
-          meows: 0,
-          uuid: uuid,
-          permission: 1,
-        },
-      });
-
-      player = await prisma.player.findFirst({
-        where: {
-          uuid: uuid,
-        },
-      });
-    }
 
     sendWebhookMessage(
       usr,
