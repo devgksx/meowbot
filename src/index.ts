@@ -35,6 +35,7 @@ export let bot: Bot;
 
 export interface Command {
   command: string;
+  aliases?: string[];
   desc: string;
   usage: string;
   permission: number;
@@ -68,7 +69,8 @@ const executeCommand = (
 ) => {
   commands.forEach((cmd) => {
     if (
-      command.toLowerCase() === cmd.command.toLowerCase() &&
+      (command.toLowerCase() == cmd.command.toLowerCase() ||
+        cmd.aliases?.includes(command.toLowerCase())) &&
       permission >= cmd.permission
     ) {
       cmd.exec(usr, args).then((succeeded) => {

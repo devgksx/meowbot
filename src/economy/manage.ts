@@ -1,7 +1,7 @@
 import prisma, { updatePlayer } from "../db/prisma";
 
 export const setBalance = async (uuid: string, balance: number) => {
-  updatePlayer(uuid, { balance });
+  updatePlayer(uuid, { balance: balance });
 };
 
 export const transfer = async (
@@ -50,6 +50,8 @@ export const withdraw = async (
     balance: { increment: amount },
     bank: { decrement: amount },
   });
+
+  return true;
 };
 
 export const getBalance = async (uuid: string) => {
@@ -86,6 +88,8 @@ export const deposit = async (
     balance: { decrement: amount },
     bank: { increment: amount },
   });
+
+  return true;
 };
 
 export const addBalance = async (uuid: string, amount: number) => {

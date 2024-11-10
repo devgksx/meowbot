@@ -1,12 +1,15 @@
 import { PrismaClient } from "@prisma/client";
 
-const prisma = new PrismaClient();
+export const prisma = new PrismaClient();
 
 export const updatePlayer = async (uuid: string, data: any) => {
   await prisma.player.upsert({
     where: { uuid },
     update: {
-      ...data,
+      balance: data.balance || undefined,
+      bank: data.bank || undefined,
+      meows: data.meows || undefined,
+      permission: data.permission || undefined,
     },
     create: {
       uuid,

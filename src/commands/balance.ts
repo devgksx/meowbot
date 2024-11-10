@@ -6,6 +6,7 @@ export const balanceCommand: Command = {
   command: "balance",
   desc: "Shows your balance.",
   usage: "balance",
+  aliases: ["bal"],
   permission: 1,
   exec: async (username, args) => {
     bot.chat(
