@@ -5,7 +5,7 @@ import path from "path";
 
 import { getUUID } from "./db/manage";
 import { sendWebhookMessage } from "./discord/manage";
-import prisma from "./db/prisma";
+import { getPlayer, updatePlayer } from "./db/prisma";
 
 if (!fs.existsSync("./config.json")) {
   fs.writeFileSync(
@@ -60,6 +60,26 @@ export const updateData = (newData: any) => {
 
 export let commands: Command[] = [];
 
+const executeCommand = (
+  command: string,
+  args: string[],
+  usr: string,
+  permission: number,
+) => {
+  commands.forEach((cmd) => {
+    if (
+      command.toLowerCase() === cmd.command.toLowerCase() &&
+      permission >= cmd.permission
+    ) {
+      cmd.exec(usr, args).then((succeeded) => {
+        if (!succeeded) {
+          console.log(`${usr} executed ${cmd.command} and an error occurred`);
+        }
+      });
+    }
+  });
+};
+
 export const loadCommands = async (): Promise<Command[]> => {
   const commandsDir = path.join(__dirname, "commands");
   const commands: Command[] = [];
@@ -105,7 +125,7 @@ const registerBot = async () => {
   bot = createBot({
     host: server,
     port: 25565,
-    username: process.env.USERNAME,
+    username: "bot",
     auth: "microsoft",
   });
 
@@ -122,31 +142,13 @@ const registerBot = async () => {
   bot.on("whisper", async (usr: string, msg: string) => {
     const [playerCommand, ...playerCommandArgs] = msg.split(" ");
     const uuid = await getUUID(usr);
-    const player = await prisma.player.upsert({
-      where: { uuid: uuid },
-      update: {},
-      create: {
-        meows: 0,
-        uuid: uuid,
-        permission: 1,
-      },
-    });
+    const player = await getPlayer(uuid);
 
     console.log(`WHISPER <${usr}> ${msg}`);
 
     if (!playerCommand) return;
 
-    commands.forEach((cmd) => {
-      if (
-        playerCommand.toLowerCase() == cmd.command.toLowerCase() &&
-        (player.permission || 1) >= cmd.permission
-      ) {
-        cmd.exec(usr, playerCommandArgs).then((succeeded) => {
-          if (succeeded) return;
-          console.log(`${usr} executed ${cmd.command} and an error occured`);
-        });
-      }
-    });
+    executeCommand(playerCommand, playerCommandArgs, usr, player.permission);
   });
 
   bot.on("message", async (message) => {
@@ -157,15 +159,7 @@ const registerBot = async () => {
 
     const uuid = await getUUID(usr);
 
-    const player = await prisma.player.upsert({
-      where: { uuid: uuid },
-      update: {},
-      create: {
-        meows: 0,
-        uuid: uuid,
-        permission: 1,
-      },
-    });
+    const player = await getPlayer(uuid);
 
     sendWebhookMessage(
       usr,
@@ -180,36 +174,19 @@ const registerBot = async () => {
 
     console.log(`<${usr}> ${msg}`);
 
-    if (
-      usr == "loc_" ||
-      msg.toLowerCase().includes(data.spamMessages[data.currentSpam])
-    )
-      return;
+    if (usr == "loc_") return;
 
-    if (++chatCounter >= 50) {
+    if (++chatCounter >= 100) {
       bot.chat(data.spamMessages[data.currentSpam]);
       rotateMessage();
       chatCounter = 0;
     }
 
     if (
-      (msg.toLowerCase().includes("meow") ||
-        msg.toLowerCase().includes("mreow")) &&
-      !msg.includes("$")
+      msg.toLowerCase().includes("meow") ||
+      msg.toLowerCase().includes("mreow")
     ) {
-      await prisma.player.upsert({
-        where: {
-          uuid: uuid,
-        },
-        update: {
-          meows: player.meows + 1,
-        },
-        create: {
-          meows: 1,
-          uuid: uuid,
-          permission: 1,
-        },
-      });
+      await updatePlayer(uuid, { meows: player.meows + 1 });
     }
 
     if (!msg.startsWith(prefix)) return;
@@ -218,17 +195,7 @@ const registerBot = async () => {
 
     if (!playerCommand) return;
 
-    commands.forEach((cmd) => {
-      if (
-        playerCommand.toLowerCase() == cmd.command.toLowerCase() &&
-        (player.permission || 1) >= cmd.permission
-      ) {
-        cmd.exec(usr, playerCommandArgs).then((succeeded) => {
-          if (succeeded) return;
-          console.log(`${usr} executed ${cmd.command} and an error occured`);
-        });
-      }
-    });
+    executeCommand(playerCommand, playerCommandArgs, usr, player.permission);
   });
 };
 

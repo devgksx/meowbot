@@ -11,4 +11,6 @@ model Player {
   uuid       String @id @map("_id")
   meows      Int
   permission Int
+  balance    Int
+  bank       Int
 }

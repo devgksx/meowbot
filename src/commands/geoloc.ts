@@ -8,9 +8,8 @@ export const geolocCommand: Command = {
   exec: async (username, args) => {
     const ip = args[0];
 
-    if (!ip) {
+    if (!ip || !ip.match(/^\d+,\d+,\d+,\d+$/)) {
       bot.chat(`/w ${username} Usage: ${geolocCommand.usage}`);
-      console.log(args);
       return false;
     }
 

@@ -1,6 +1,6 @@
 import { bot, Command, commands } from "..";
 import { getUUID } from "../db/manage";
-import prisma from "../db/prisma";
+import { getPlayer } from "../db/prisma";
 
 export const helpCommand: Command = {
   command: "help",
@@ -10,15 +10,7 @@ export const helpCommand: Command = {
   exec: async (username, args) => {
     const uuid = await getUUID(username);
 
-    const player = await prisma.player.upsert({
-      where: { uuid: uuid },
-      update: {},
-      create: {
-        meows: 0,
-        uuid: uuid,
-        permission: 1,
-      },
-    });
+    const player = await getPlayer(uuid);
 
     const playerPermissionLevel = player.permission || 1;
     if (args[0]) {
