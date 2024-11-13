@@ -7,7 +7,7 @@ export const chatCommand: Command = {
   permission: 1,
   exec: async (_, args) => {
     const msg = args.join(" ");
-    if (!msg.startsWith("/")) bot.chat(msg);
+    if (!msg.startsWith("/") || !msg.startsWith("!")) bot.chat(msg);
     return true;
   },
 };
