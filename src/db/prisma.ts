@@ -17,6 +17,7 @@ export const updatePlayer = async (uuid: string, data: any) => {
       bank: 1000,
       meows: 0,
       permission: 1,
+      cooldown: 0,
     },
   });
 };
@@ -31,6 +32,7 @@ export const getPlayer = async (uuid: string) => {
       bank: 1000,
       meows: 0,
       permission: 1,
+      cooldown: 0,
     },
   });
 };

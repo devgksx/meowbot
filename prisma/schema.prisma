@@ -13,4 +13,5 @@ model Player {
   permission Int
   balance    Int
   bank       Int
+  cooldown   Int
 }

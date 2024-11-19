@@ -28,6 +28,7 @@ export const transfer = async (
         bank: 0,
         meows: 0,
         permission: 1,
+        cooldown: 0,
       },
       update: { balance: { increment: amount } },
     }),

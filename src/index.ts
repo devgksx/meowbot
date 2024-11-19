@@ -6,6 +6,7 @@ import path from "path";
 import { getUUID } from "./db/manage";
 import { sendWebhookMessage } from "./discord/manage";
 import { getPlayer, updatePlayer } from "./db/prisma";
+import { runAPI } from "./api/manage";
 
 if (!fs.existsSync("./config.json")) {
   fs.writeFileSync(
@@ -61,26 +62,94 @@ export const updateData = (newData: any) => {
 
 export let commands: Command[] = [];
 
-const executeCommand = (
+const COOLDOWN_PERIOD = 2500;
+const RATE_LIMIT_DELAY = 2000;
+
+interface CommandQueueItem {
+  command: string;
+  args: string[];
+  usr: string;
+  permission: number;
+  resolve: (result: boolean) => void;
+}
+
+const commandQueue: CommandQueueItem[] = [];
+let isProcessingQueue = false;
+
+const processQueue = async () => {
+  if (isProcessingQueue || commandQueue.length === 0) return;
+
+  isProcessingQueue = true;
+
+  while (commandQueue.length > 0) {
+    const { command, args, usr, permission, resolve } = commandQueue.shift()!;
+
+    const result = await executeCommandInternal(command, args, usr, permission);
+    resolve(result);
+
+    await new Promise((res) => setTimeout(res, RATE_LIMIT_DELAY));
+  }
+
+  isProcessingQueue = false;
+};
+
+const executeCommandInternal = async (
   command: string,
   args: string[],
   usr: string,
   permission: number,
-) => {
-  commands.forEach((cmd) => {
-    if (
-      (command.toLowerCase() == cmd.command.toLowerCase() ||
-        cmd.aliases?.includes(command.toLowerCase())) &&
-      permission >= cmd.permission
-    ) {
-      cmd.exec(usr, args).then((succeeded) => {
-        if (!succeeded) {
-          console.log(`${usr} executed ${cmd.command} and an error occurred`);
-        }
-      });
+): Promise<boolean> => {
+  try {
+    const uuid = await getUUID(usr);
+    const player = await getPlayer(uuid);
+    const currentTime = Date.now();
+
+    if (currentTime < player.cooldown) {
+      const remainingTime = Math.ceil((player.cooldown - currentTime) / 1000);
+      bot.chat(`/w ${usr} You're on cooldown! Please wait ${remainingTime} seconds.`);
+      return false;
     }
+
+    for (const cmd of commands) {
+      if (
+        (command.toLowerCase() === cmd.command.toLowerCase() ||
+          cmd.aliases?.includes(command.toLowerCase())) &&
+        permission >= cmd.permission
+      ) {
+        const succeeded = await cmd.exec(usr, args);
+
+        if (succeeded) {
+          await updatePlayer(uuid, { cooldown: currentTime + COOLDOWN_PERIOD });
+          console.log(`Executed command ${command} with args ${args} from player ${usr} with cooldown ${currentTime + COOLDOWN_PERIOD}`);
+          return true;
+        } else {
+          bot.chat(`/w ${usr} An error occurred while executing your command.`);
+          return false;
+        }
+      }
+    }
+
+    bot.chat(`/w ${usr} Unknown command: ${command}`);
+    return false;
+  } catch (error) {
+    bot.chat(`/w ${usr} An internal error occurred. Please try again later.`);
+    return false;
+  }
+};
+
+export const executeCommand = (
+  command: string,
+  args: string[],
+  usr: string,
+  permission: number,
+): Promise<boolean> => {
+  return new Promise((resolve) => {
+    commandQueue.push({ command, args, usr, permission, resolve });
+    processQueue();
   });
 };
+
+
 
 export const loadCommands = async (): Promise<Command[]> => {
   const commandsDir = path.join(__dirname, "commands");
@@ -103,7 +172,7 @@ export const loadCommands = async (): Promise<Command[]> => {
 
             const command = commandModule[
               (commandName.match(/^\d/) ? `_${commandName}` : commandName) +
-                "Command"
+              "Command"
             ] as Command;
 
             if (command && command.command && command.exec) {
@@ -202,3 +271,4 @@ const registerBot = async () => {
 };
 
 registerBot();
+runAPI();
