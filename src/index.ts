@@ -211,9 +211,19 @@ const registerBot = async () => {
   });
 
   bot.on("whisper", async (usr: string, msg: string) => {
+    
+    if (usr == "moooomoooo") return;
+
     const [playerCommand, ...playerCommandArgs] = msg.split(" ");
     const uuid = await getUUID(usr);
     const player = await getPlayer(uuid);
+
+    sendWebhookMessage(
+      usr,
+      uuid,
+      `${msg}`,
+      { color: 0x800080 },
+    );
 
     console.log(`WHISPER <${usr}> ${msg}`);
 
