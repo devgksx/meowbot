@@ -20,6 +20,11 @@ export const registerCommandRoute = () => {
 
     let response: Promise<boolean>;
 
+    if (command.toString() === "chat" && args.toString().split(" ")[0] === `/w ${bot.username}`) {
+      res.status(400).json({ success: false, message: "Cannot whisper to bot" });
+      return;
+    }
+
     if (command.toString() === "chat" && args.toString().split(" ")[0] === "/w") {
       let playersOnline = bot.players;
       let player = args.toString().split(" ")[1];
