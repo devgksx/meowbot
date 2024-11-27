@@ -17,6 +17,7 @@ if (!fs.existsSync("./config.json")) {
         WEBHOOK_URL: "",
         DISCORD_ENABLED: false,
         SERVER: "constantiam.net",
+        WHISPER_WEBHOOK_URL: "",
       },
       null,
       2,
@@ -31,6 +32,7 @@ const server = config["SERVER"];
 
 export const webhook_url = config["WEBHOOK_URL"];
 export const discord_enabled = config["DISCORD_ENABLED"];
+export const whisper_webhook_url = config["WHISPER_WEBHOOK_URL"];
 
 export let bot: Bot;
 
@@ -129,7 +131,6 @@ const executeCommandInternal = async (
       }
     }
 
-    bot.chat(`/w ${usr} Unknown command: ${command}`);
     return false;
   } catch (error) {
     bot.chat(`/w ${usr} An internal error occurred. Please try again later.`);
@@ -211,19 +212,23 @@ const registerBot = async () => {
   });
 
   bot.on("whisper", async (usr: string, msg: string) => {
-    
+
     if (usr == "moooomoooo") return;
 
-    const [playerCommand, ...playerCommandArgs] = msg.split(" ");
     const uuid = await getUUID(usr);
-    const player = await getPlayer(uuid);
 
     sendWebhookMessage(
+      true,
       usr,
       uuid,
       `${msg}`,
       { color: 0x800080 },
     );
+
+    if (!msg.startsWith(prefix)) return;
+
+    const [playerCommand, ...playerCommandArgs] = msg.slice(1).split(" ");
+    const player = await getPlayer(uuid);
 
     console.log(`WHISPER <${usr}> ${msg}`);
 
@@ -243,6 +248,7 @@ const registerBot = async () => {
     const player = await getPlayer(uuid);
 
     sendWebhookMessage(
+      false,
       usr,
       uuid,
       `${msg}`,

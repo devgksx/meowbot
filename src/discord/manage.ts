@@ -1,4 +1,4 @@
-import { webhook_url, discord_enabled } from "..";
+import { webhook_url, discord_enabled, whisper_webhook_url } from "..";
 
 export const headCache: Record<string, string> = {};
 
@@ -25,6 +25,7 @@ export const getHead = async (uuid: string): Promise<string> => {
 const removeMarkdown = (text: string) => text.replace(/([*_~`|])/g, "\\$1");
 
 export const sendWebhookMessage = async (
+  whisper: boolean,
   username: string,
   uuid: string,
   content: string,
@@ -35,7 +36,7 @@ export const sendWebhookMessage = async (
     fields?: { name: string; value: string; inline?: boolean }[];
   },
 ) => {
-  if (!webhook_url || !discord_enabled) return;
+  if (!webhook_url || !discord_enabled || !whisper_webhook_url) return;
 
   const embed = {
     description: `**${removeMarkdown(username)}**: ${removeMarkdown(content)}`,
@@ -48,7 +49,7 @@ export const sendWebhookMessage = async (
   };
 
   try {
-    const response = await fetch(webhook_url, {
+    const response = await fetch(whisper ? whisper_webhook_url : webhook_url, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
