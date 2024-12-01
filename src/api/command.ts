@@ -43,6 +43,18 @@ export const registerCommandRoute = () => {
       RequestQueue.pop();
     }
 
+    if (command.toString() == "botinfo") {
+      let onlineplayers = Object.keys(bot.players).length;
+      let botPos = bot.entity.position;
+      let botHealth = bot.health;
+      let botFood = bot.foodSaturation;
+      res.status(200).json({
+        success: true,
+        message: `Server is online with ${onlineplayers} players.\nBot is at ${botPos}.\nBot has ${botHealth} health and ${botFood} food saturation.`
+      });
+      return;
+    }
+
     if (command.toString() == "onlineplayers") {
       let playersOnline = bot.players;
       let playerList = [];

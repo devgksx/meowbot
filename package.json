@@ -109,5 +109,8 @@
   "bugs": {
     "url": "https://github.com/devgksx/meowbot/issues"
   },
-  "homepage": "https://github.com/devgksx/meowbot#readme"
+  "homepage": "https://github.com/devgksx/meowbot#readme",
+  "devDependencies": {
+    "@types/node": "^22.10.1"
+  }
 }
