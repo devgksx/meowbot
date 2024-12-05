@@ -3,6 +3,7 @@ import { Request, Response } from "express";
 import { bot, executeCommand } from "..";
 
 const RequestQueue: { command: string, args: string[] }[] = [];
+const BroadcastQueue: { message: string, progress: number }[] = [];
 
 export const registerCommandRoute = () => {
   api.get('/command/', async (req: Request, res: Response) => {
@@ -19,6 +20,38 @@ export const registerCommandRoute = () => {
     }
 
     let response: Promise<boolean>;
+
+    if (command.toString() == "broadcast") {
+      let playersOnline = bot.players;
+
+      if (Object.keys(playersOnline).length == 0) {
+        res.status(400).json({ success: false, message: "No players online" });
+        return;
+      }
+
+      let message = args.toString();
+      let progress = 0;
+      BroadcastQueue.push({ message, progress });
+
+    }
+
+    if (command.toString() == "checkbroadcast") {
+      let message = args.toString();
+      let found = false;
+      for (let i = 0; i < BroadcastQueue.length; i++) {
+        if (BroadcastQueue[i].message == message) {
+          found = true;
+          console.log(BroadcastQueue[i].progress);
+          res.status(200).json({ success: true, message: "Message found in broadcast queue", progress: BroadcastQueue[i].progress });
+          return;
+        }
+      }
+      if (!found) {
+        console.log("Message not found in broadcast queue");
+        res.status(400).json({ success: false, message: "Message not found in broadcast queue", progress: 0 });
+        return;
+      }
+    }
 
     if (command.toString() === "chat" && args.toString().split(" ")[0] === `/w ${bot.username}`) {
       res.status(400).json({ success: false, message: "Cannot whisper to bot" });
@@ -42,6 +75,28 @@ export const registerCommandRoute = () => {
       response = executeCommand(command, args, "API", 1);
       RequestQueue.pop();
     }
+
+
+    if (BroadcastQueue.length == 1) {
+      const { message } = BroadcastQueue[0];
+      let playersOnline = bot.players;
+      let playerList = Object.keys(playersOnline);
+      let i = 0;
+
+      let interval = setInterval(() => {
+        if (i < playerList.length) {
+          bot.chat(`/w ${playerList[i]} ${message}`);
+          console.log("Broadcasting message to " + playerList[i]);
+          let progress = i / playerList.length * 100;
+          BroadcastQueue[0].progress = progress;
+          i++;
+        } else {
+          clearInterval(interval);
+          BroadcastQueue.pop();
+        }
+      }, 2000);
+    }
+
 
     if (command.toString() == "botinfo") {
       let onlineplayers = Object.keys(bot.players).length;
