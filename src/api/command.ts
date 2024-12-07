@@ -35,6 +35,27 @@ export const registerCommandRoute = () => {
 
     }
 
+
+    if (command.toString() === "checkbroadcast") {
+      const message = args.toString();
+      const foundBroadcast = BroadcastQueue.find(job => job.message === message);
+
+      if (foundBroadcast) {
+        res.status(200).json({
+          success: true,
+          message: "Message found in broadcast queue",
+          progress: foundBroadcast.progress,
+        });
+      } else {
+        res.status(400).json({
+          success: false,
+          message: "Message not found in broadcast queue",
+          progress: 0,
+        });
+      }
+      return;
+    }
+
     if (BroadcastQueue.length == 1) {
       const broadcastJob = BroadcastQueue[0];
       const { message } = broadcastJob;
@@ -47,8 +68,8 @@ export const registerCommandRoute = () => {
           bot.chat(`/w ${playerList[i]} ${message}`);
           let progress = Math.round((i + 1) / playerList.length * 100);
           console.log(`Broadcasting message to ${playerList[1]} | progress ${progress}%`);
-          broadcastJob.progress = progress;
-          i++;
+          broadcastJob.progress =
+            i++;
         } else {
           clearInterval(interval);
           broadcastJob.progress = 100;
@@ -56,6 +77,7 @@ export const registerCommandRoute = () => {
         }
       }, 2000);
     }
+
 
     if (command.toString() === "chat" && args.toString().split(" ")[0] === `/w ${bot.username}`) {
       res.status(400).json({ success: false, message: "Cannot whisper to bot" });
@@ -79,28 +101,6 @@ export const registerCommandRoute = () => {
       response = executeCommand(command, args, "API", 1);
       RequestQueue.pop();
     }
-
-
-    if (BroadcastQueue.length == 1) {
-      const { message } = BroadcastQueue[0];
-      let playersOnline = bot.players;
-      let playerList = Object.keys(playersOnline);
-      let i = 0;
-
-      let interval = setInterval(() => {
-        if (i < playerList.length) {
-          bot.chat(`/w ${playerList[i]} ${message}`);
-          console.log("Broadcasting message to " + playerList[i]);
-          let progress = i / playerList.length * 100;
-          BroadcastQueue[0].progress = progress;
-          i++;
-        } else {
-          clearInterval(interval);
-          BroadcastQueue.pop();
-        }
-      }, 2000);
-    }
-
 
     if (command.toString() == "botinfo") {
       let onlineplayers = Object.keys(bot.players).length;
