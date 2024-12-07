@@ -35,7 +35,6 @@ export const registerCommandRoute = () => {
 
     }
 
-
     if (command.toString() === "checkbroadcast") {
       const message = args.toString();
       const foundBroadcast = BroadcastQueue.find(job => job.message === message);
@@ -67,7 +66,7 @@ export const registerCommandRoute = () => {
         if (i < playerList.length) {
           bot.chat(`/w ${playerList[i]} ${message}`);
           let progress = Math.round((i + 1) / playerList.length * 100);
-          console.log(`Broadcasting message to ${playerList[1]} | progress ${progress}%`);
+          console.log(`Broadcasting message to ${playerList[i]} | progress ${progress}%`);
           broadcastJob.progress = progress;
           i++;
         } else {
