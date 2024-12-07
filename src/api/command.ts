@@ -68,8 +68,8 @@ export const registerCommandRoute = () => {
           bot.chat(`/w ${playerList[i]} ${message}`);
           let progress = Math.round((i + 1) / playerList.length * 100);
           console.log(`Broadcasting message to ${playerList[1]} | progress ${progress}%`);
-          broadcastJob.progress =
-            i++;
+          broadcastJob.progress = progress;
+          i++;
         } else {
           clearInterval(interval);
           broadcastJob.progress = 100;
