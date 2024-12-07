@@ -35,22 +35,26 @@ export const registerCommandRoute = () => {
 
     }
 
-    if (command.toString() == "checkbroadcast") {
-      let message = args.toString();
-      let found = false;
-      for (let i = 0; i < BroadcastQueue.length; i++) {
-        if (BroadcastQueue[i].message == message) {
-          found = true;
-          console.log(BroadcastQueue[i].progress);
-          res.status(200).json({ success: true, message: "Message found in broadcast queue", progress: BroadcastQueue[i].progress });
-          return;
+    if (BroadcastQueue.length == 1) {
+      const broadcastJob = BroadcastQueue[0];
+      const { message } = broadcastJob;
+      const playersOnline = bot.players;
+      const playerList = Object.keys(playersOnline);
+      let i = 0;
+
+      const interval = setInterval(() => {
+        if (i < playerList.length) {
+          bot.chat(`/w ${playerList[i]} ${message}`);
+          let progress = Math.round((i + 1) / playerList.length * 100);
+          console.log(`Broadcasting message to ${playerList[1]} | progress ${progress}%`);
+          broadcastJob.progress = progress;
+          i++;
+        } else {
+          clearInterval(interval);
+          broadcastJob.progress = 100;
+          BroadcastQueue.shift();
         }
-      }
-      if (!found) {
-        console.log("Message not found in broadcast queue");
-        res.status(400).json({ success: false, message: "Message not found in broadcast queue", progress: 0 });
-        return;
-      }
+      }, 2000);
     }
 
     if (command.toString() === "chat" && args.toString().split(" ")[0] === `/w ${bot.username}`) {
