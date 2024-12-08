@@ -55,7 +55,11 @@ export const registerCommandRoute = () => {
       return;
     }
 
-    if (BroadcastQueue.length == 1) {
+
+    let isBroadcasting = false;
+
+    if (!isBroadcasting && BroadcastQueue.length == 1) {
+      isBroadcasting = true;
       const broadcastJob = BroadcastQueue[0];
       const { message } = broadcastJob;
       const playersOnline = bot.players;
@@ -65,14 +69,39 @@ export const registerCommandRoute = () => {
       const interval = setInterval(() => {
         if (i < playerList.length) {
           bot.chat(`/w ${playerList[i]} ${message}`);
-          let progress = Math.round((i + 1) / playerList.length * 100);
+          let progress = Math.round(((i + 1) / playerList.length) * 100);
           console.log(`Broadcasting message to ${playerList[i]} | progress ${progress}%`);
           broadcastJob.progress = progress;
           i++;
         } else {
           clearInterval(interval);
           broadcastJob.progress = 100;
+          console.log(`Broadcast completed: ${message}`);
           BroadcastQueue.shift();
+          isBroadcasting = false;
+          if (BroadcastQueue.length > 0) {
+            isBroadcasting = true;
+            const nextJob = BroadcastQueue[0];
+            const nextMessage = nextJob.message;
+            const nextPlayerList = Object.keys(playersOnline);
+            let nextI = 0;
+
+            const nextInterval = setInterval(() => {
+              if (nextI < nextPlayerList.length) {
+                bot.chat(`/w ${nextPlayerList[nextI]} ${nextMessage}`);
+                let nextProgress = Math.round(((nextI + 1) / nextPlayerList.length) * 100);
+                console.log(`Broadcasting message to ${nextPlayerList[nextI]} | progress ${nextProgress}%`);
+                nextJob.progress = nextProgress;
+                nextI++;
+              } else {
+                clearInterval(nextInterval);
+                nextJob.progress = 100;
+                console.log(`Broadcast completed: ${nextMessage}`);
+                BroadcastQueue.shift();
+                isBroadcasting = false;
+              }
+            }, 2000);
+          }
         }
       }, 2000);
     }
